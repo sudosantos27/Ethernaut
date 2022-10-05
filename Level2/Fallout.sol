@@ -1,0 +1,56 @@
+// Claim ownership of the contract below to complete this level.
+
+// SPDX-License-Identifier: MIT
+
+pragma solidity ^0.6.0;
+
+import '@openzeppelin/contracts/math/SafeMath.sol';
+
+contract Fallout {
+  
+  using SafeMath for uint256;
+  mapping (address => uint) allocations;
+  address payable public owner;
+
+/* constructor */
+
+function Fal1out() public payable {
+    owner = msg.sender;
+    allocations[owner] = msg.value;
+  }
+
+  modifier onlyOwner {
+	        require(
+	            msg.sender == owner,
+	            "caller is not the owner"
+	        );
+	        _;
+	    }
+
+  function allocate() public payable {
+    allocations[msg.sender] = allocations[msg.sender].add(msg.value);
+  }
+
+  function sendAllocation(address payable allocator) public {
+    require(allocations[allocator] > 0);
+    allocator.transfer(allocations[allocator]);
+  }
+
+  function collectAllocations() public onlyOwner {
+    msg.sender.transfer(address(this).balance);
+  }
+
+  function allocatorBalance(address allocator) public view returns (uint) {
+    return allocations[allocator];
+  }
+}
+
+/** If we paste this code into Remix, we can see that the Fallout function is typed like this: Fal1out
+
+So it is not the constructor, there is no owner.
+
+To become the owner we just need to call the function sending 1 wei because is payable: 
+
+await contract.Fal1out({value: 1})
+
+Now we owned the contract */
